@@ -1,3 +1,4 @@
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 html_doc = open("index.html")
@@ -5,11 +6,27 @@ html_doc = open("index.html")
 soup = BeautifulSoup(html_doc, 'html.parser')
 
 
+def returnIndex(month):
+    return{
+        'Jan': 1,
+        'Feb': 2,
+        'Mar': 3,
+        'Apr': 4,
+        'May': 5,
+        'Jun': 6,
+        'Jul': 7,
+        'Aug': 8,
+        'Sep': 9,
+        'Oct': 10,
+        'Nov': 11,
+        'Dec': 12
+    }[month]
+
+
 class Event:
-    def __init__(self, name, month, day, link):
+    def __init__(self, name, date, link):
         self.name = name
-        self.month = month
-        self.day = day
+        self.date = date
         self.link = link
 
 
@@ -27,13 +44,18 @@ for div in divs:
 
     month = div.find("span", {"class": "_5a4-"})
     month = month.text
+    month = returnIndex(month)
 
     day = div.find("span", {"class": "_5a4z"})
     day = day.text
+    day = int(day)
+
+    date = datetime(2022, month, day)
 
     link = div.find("div", {"class", "_4dmk"})
     link = "https://www.facebook.com" + link.a.get('href')
 
-    obj = Event(name, month, day, link)
+    obj = Event(name, date, link)
 
     events.append(obj)
+    print(obj.date)

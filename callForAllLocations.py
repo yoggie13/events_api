@@ -1,6 +1,7 @@
-# lokacije se pozivaju iz baze
-locations = ['barutanabeograd', 'DorcolPlatz']
+import pandas as pd
 
-for location in locations:
+locations = pd.read_csv("locations.csv")
+
+for location in locations["loc_link_part"]:
     link = "https://www.facebook.com/pg/" + location + "/events/?ref=page_internal"
-    # pozvati skriptu sa linkom
+    print(link)
