@@ -58,4 +58,3 @@ for div in divs:
     obj = Event(name, date, link)
 
     events.append(obj)
-    print(obj.date)
