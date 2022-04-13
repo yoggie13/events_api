@@ -11,7 +11,7 @@ CORS(app)
 
 @app.route("/events", methods=['GET'])
 def get_events():
-    data = pd.read_csv("events_by_location.csv")
+    data = pd.read_csv("events_test.csv")
     locations = pd.read_csv('locations.csv')
     ret_data = pd.merge(how='left', left=data, left_on='loc_ID',
                             right=locations, right_on='loc_ID')
