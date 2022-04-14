@@ -1,4 +1,3 @@
-from crypt import methods
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
@@ -17,7 +16,7 @@ def get_events():
                             right=locations, right_on='loc_ID')
 
     ret_data = ret_data[["event_name",
-                         "event_date", "event_link", "loc_name"]]
+                         "event_date", "event_link", "event_pic_link", "loc_name"]]
     ret_data = ret_data.to_dict('records')
     ret_data
 

@@ -1,6 +1,7 @@
 from datetime import datetime
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import csv
 import os
@@ -27,45 +28,53 @@ def writeEvents(events):
     with open("events_test.csv", "a", encoding="utf-8") as stream:
         writer = csv.writer(stream)
         for index, event in enumerate(events):
-            print(event.name)
-            row = (1, index, event.name, event.date, event.link)
+            row = (1, index, event.name, event.date,
+                   event.link, event.link_pic)
             writer.writerow(row)
 
 
+def getPic(_driver, link):
+    _driver.get(link)
+    soup = BeautifulSoup(_driver.page_source)
+    pic = soup.find("img", {"data-imgperflogname": "profileCoverPhoto"})
+    while(pic == None):
+        soup = BeautifulSoup(_driver.page_source)
+        pic = soup.find("img", {"data-imgperflogname": "profileCoverPhoto"})
+    return pic['src']
+
+
 class Event:
-    def __init__(self, name, date, link):
+    def __init__(self, name, date, link, link_pic):
         self.name = name
         self.date = date
         self.link = link
+        self.link_pic = link_pic
 
 
 # Instantiate options
-opts = Options()
 # opts.add_argument(" — headless")  # Uncomment if the headless version needed
-opts.binary_location = "C:\Program Files\Google\Chrome\Application\chrome.exe"
 
 # Set the location of the webdriver
-chrome_driver = os.getcwd() + "/chromedriver.exe"
+chrome_driver = os.getcwd() + "\chromedriver.exe"
 
 # Instantiate a webdriver
-driver = webdriver.Chrome(options=opts, executable_path=chrome_driver)
-
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 # Load the HTML page
 driver.get("https://www.facebook.com/pg/barutanabeograd/events?ref=page_internal")
 
 # Parse processed webpage with BeautifulSoup
-soup = BeautifulSoup(driver.page_source)
+soup = BeautifulSoup(driver.page_source, "html.parser")
 
 upcoming_events = soup.find("div", {"id": "upcoming_events_card"})
+
 found = upcoming_events.find("div", {"class": "_p6a"})
-print(found)
+driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 while(found != None):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     soup = BeautifulSoup(driver.page_source)
     upcoming_events = soup.find("div", {"id": "upcoming_events_card"})
     found = upcoming_events.find("div", {"class": "_p6a"})
-    print(found)
 
 events = []
 
@@ -92,7 +101,9 @@ for div in divs:
     link = div.find("div", {"class", "_4dmk"})
     link = "https://www.facebook.com" + link.a.get('href')
 
-    obj = Event(name, date, link)
+    link_pic = getPic(driver, link)
+
+    obj = Event(name, date, link, link_pic)
 
     events.append(obj)
 
