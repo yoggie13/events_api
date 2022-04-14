@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
 import pandas as pd
+import loc_scrapper
 
 app = Flask(__name__)
 CORS(app)
@@ -17,8 +18,9 @@ def get_events():
 
     ret_data = ret_data[["event_name",
                          "event_date", "event_link", "event_pic_link", "loc_name"]]
+    ret_data["event_date"] = pd.to_datetime(ret_data["event_date"])
+    ret_data = ret_data.sort_values(by="event_date")
     ret_data = ret_data.to_dict('records')
-    ret_data
 
     return {'data': ret_data}, 200
 
@@ -34,25 +36,37 @@ def get_locations():
 def add_location():
     parser = reqparse.RequestParser()
 
-    parser.add_argument('id', required=True, location='args')
-    parser.add_argument('name', required=True, location='args')
-    parser.add_argument('link_part', required=True, location='args')
+    parser.add_argument('link', required=True, location='args')
     args = parser.parse_args()
 
+    name = loc_scrapper.scrape_loc(args['link'])
+
+    link_part = args['link'].split(".facebook.com/")[1]
+    link_part = link_part[0:-1]
+
+    data = pd.read_csv('locations.csv')
+
+    if 'Unnamed: 3' in data.columns:
+        data = data.drop(['Unnamed: 3'], axis=1)
+
+    id = 0
+
+    if not data.empty:
+        id = data.tail(1)['loc_ID']+1
+
     new_data = pd.DataFrame({
-        'loc_id': args['ID'],
-        'loc_name': args['name'],
-        'loc_link_part': args['link_part'],
+        'loc_ID': id,
+        'loc_name': name,
+        'loc_link_part': link_part,
         'locations': [[]]
     })
 
     new_data = new_data.iloc[:, :-1]
 
-    data = pd.read_csv('locations.csv')
     data = data.append(new_data, ignore_index=True)
     data.to_csv('locations.csv', index=False)
 
-    return {'data': data.to_dict()}, 200
+    return {'data': data.to_dict('records')}, 200
 
 
 # api.add_resource(Events, '/events')
