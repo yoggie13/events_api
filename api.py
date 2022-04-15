@@ -2,7 +2,9 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
 import pandas as pd
+import csv
 import loc_scrapper
+import events_scrapper
 
 app = Flask(__name__)
 CORS(app)
@@ -78,6 +80,14 @@ def add_location():
 
     data = data.append(new_data, ignore_index=True)
     data.to_csv('locations.csv', index=False)
+
+    events = events_scrapper.scrape_events(
+        new_data["loc_ID"].iloc[0], "https://www.facebook.com/pg/" + new_data["loc_link_part"].iloc[0] + "/events/?ref=page_internal")
+
+    with open("events_test.csv", "a", newline='', encoding="utf-8") as stream:
+        writer = csv.writer(stream)
+        for event in events:
+            writer.writerow(event)
 
     return {'data': data.to_dict('records')}, 200
 

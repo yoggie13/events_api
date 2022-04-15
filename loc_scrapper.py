@@ -20,6 +20,7 @@ def scrape_loc(url):
     name = soup.find("h1", {"class": "gmql0nx0 l94mrbxd p1ri9a11 lzcic4wl"})
 
     while(name == None):
+        soup = BeautifulSoup(driver.page_source, "html.parser")
         name = soup.find(
             "h1", {"class": "gmql0nx0 l94mrbxd p1ri9a11 lzcic4wl"})
 
