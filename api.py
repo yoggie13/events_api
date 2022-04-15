@@ -41,7 +41,7 @@ def get_events():
 @app.route("/locations", methods=['GET'])
 def get_locations():
     data = pd.read_csv("locations.csv")
-    data = data.to_dict()
+    data = data.to_dict('records')
     return {'data': data}, 200
 
 
