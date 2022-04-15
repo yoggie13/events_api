@@ -9,18 +9,31 @@ CORS(app)
 # api = Api(app)
 
 
-@app.route("/events", methods=['GET'])
-def get_events():
+def get_events_func(param=None):
     data = pd.read_csv("events_test.csv")
     locations = pd.read_csv('locations.csv')
     ret_data = pd.merge(how='left', left=data, left_on='loc_ID',
                             right=locations, right_on='loc_ID')
 
+    if param != None:
+        ret_data = ret_data.loc[ret_data['loc_link_part'] == param]
+
     ret_data = ret_data[["event_name",
                          "event_date", "event_link", "event_pic_link", "loc_name"]]
     ret_data["event_date"] = pd.to_datetime(ret_data["event_date"])
     ret_data = ret_data.sort_values(by="event_date")
-    ret_data = ret_data.to_dict('records')
+
+    return ret_data
+
+
+@app.route("/events", methods=['GET'])
+def get_events():
+    parser = reqparse.RequestParser()
+
+    parser.add_argument('filter', required=False, location='args')
+    args = parser.parse_args()
+
+    ret_data = get_events_func(args['filter']).to_dict('records')
 
     return {'data': ret_data}, 200
 
