@@ -2,8 +2,6 @@ flask
 flask_restful
 pandas
 selenium
-selenium.webdriver.chrome.service
 bs4
 datetime
-webdriver_manager.chrome
 gunicorn
