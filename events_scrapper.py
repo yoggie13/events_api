@@ -40,6 +40,17 @@ def scrape_events(loc_id, link):
 
     upcoming_events = soup.find("div", {"id": "upcoming_events_card"})
 
+    id = 1
+
+    while(upcoming_events == None):
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        upcoming_events = soup.find("div", {"id": "upcoming_events_card"})
+        print(upcoming_events)
+        id = id+1
+
+        if(id == 100):
+            break
+
     loader = upcoming_events.find("div", {"class": "_p6a"})
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
