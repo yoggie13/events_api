@@ -45,9 +45,19 @@ def scrape_events(loc_id, link):
     driver.get(link)
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
-    print(soup)
 
     upcoming_events = soup.find("div", {"id": "upcoming_events_card"})
+
+    id = 0
+
+    while(upcoming_events == None):
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        upcoming_events = soup.find("div", {"id": "upcoming_events_card"})
+
+        id = id+1
+        if(id == 100000):
+            print('ne radi')
+            break
 
     loader = upcoming_events.find("div", {"class": "_p6a"})
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
