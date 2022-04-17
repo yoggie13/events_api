@@ -36,7 +36,6 @@ def getPic(_driver, link):
 
 def scrape_events(loc_id, link):
     load_dotenv()
-
     chrome_options = webdriver.ChromeOptions()
     chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
     chrome_options.add_argument("--headless")
@@ -47,9 +46,15 @@ def scrape_events(loc_id, link):
         executable_path=os.environ.get("CHROMEDRIVER_PATH")), options=chrome_options)
     driver.get(link)
 
+    print(link)
+
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
+    print(soup)
+
     upcoming_events = soup.find("div", {"id": "upcoming_events_card"})
+
+    print(upcoming_events)
 
     loader = upcoming_events.find("div", {"class": "_p6a"})
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
