@@ -5,6 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import os
+import time
 
 
 def returnIndex(month):
@@ -47,6 +48,7 @@ def scrape_events(loc_id, link):
     driver.get(link)
 
     print(link)
+    time.sleep(3)
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
 
